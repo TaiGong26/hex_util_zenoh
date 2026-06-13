@@ -3,9 +3,9 @@ requires = ["setuptools >= 61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "hex_util_runtime"
-version = "0.0.1-alpha.15"
-description = "HEXFELLOW Runtime Utilities"
+name = "hex_util_zenoh"
+version = "0.0.1-alpha.1"
+description = "HEXFELLOW Zenoh Communication Utilities"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [{ name = "Dong Zhaorui", email = "joray.dong@hexfellow.com" }]
@@ -15,7 +15,7 @@ maintainers = [
 ]
 keywords = ["hex", "util", "runtime"]
 requires-python = ">=3.8"
-dependencies = ["numpy>=2.2.6"]
+dependencies = ["eclipse-zenoh>=1.0.0"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -30,7 +30,11 @@ classifiers = [
 
 
 [project.urls]
-Homepage = "https://github.com/hexfellow/hex_util_runtime"
-Repository = "https://github.com/hexfellow/hex_util_runtime.git"
-"Bug Tracker" = "https://github.com/hexfellow/hex_util_runtime/issues"
-Documentation = "https://github.com/hexfellow/hex_util_runtime/wiki"
+Homepage = "https://github.com/hexfellow/hex_util_zenoh"
+Repository = "https://github.com/hexfellow/hex_util_zenoh.git"
+"Bug Tracker" = "https://github.com/hexfellow/hex_util_zenoh/issues"
+Documentation = "https://github.com/hexfellow/hex_util_zenoh/wiki"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hex_util_zenoh*"]

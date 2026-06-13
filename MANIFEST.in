@@ -1,8 +1,8 @@
 include LICENSE
 include README.md
-include requirements.txt
 
-recursive-include package_name *
+recursive-include hex_util_zenoh *
+recursive-include examples *
 
 recursive-exclude * *.pyc
 recursive-exclude * .DS_Store
