@@ -15,28 +15,31 @@ class TalkerNode(HexZenohNode):
     def __init__(self):
         super().__init__()
 
-    def run(self) -> None:
-        self.start()
+    def start(self) -> None:
+        super().start()
         self.create_pub("chatter")
-        count = 0
-        print("TalkerNode: Started publishing on 'chatter'...")
-        try:
-            while self.is_working:
-                message = f"Hello World: {count}"
-                self.pub("chatter", message.encode("utf-8"))
-                print(f"TalkerNode: Published: '{message}'")
-                count += 1
-                time.sleep(1)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            self.close()
-            print("TalkerNode: Stopped.")
+
+    def pub_chatter(self, message: bytes) -> None:
+        self.pub("chatter", message)
 
 
 def main():
     node = TalkerNode()
-    node.run()
+    node.start()
+    count = 0
+    print("TalkerNode: Started publishing on 'chatter'...")
+    try:
+        while node.is_working:
+            message = f"Hello World: {count}"
+            node.pub_chatter(message.encode("utf-8"))
+            print(f"TalkerNode: Published: '{message}'")
+            count += 1
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.close()
+        print("TalkerNode: Stopped.")
 
 
 if __name__ == "__main__":

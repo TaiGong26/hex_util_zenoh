@@ -13,7 +13,7 @@ maintainers = [
   { name = "jecjune", email = "zejun.chen@hexfellow.com" },
   { name = "Dong Zhaorui", email = "joray.dong@hexfellow.com" },
 ]
-keywords = ["hex", "util", "runtime"]
+keywords = ["hex", "util", "zenoh"]
 requires-python = ">=3.8"
 dependencies = ["eclipse-zenoh>=1.0.0"]
 classifiers = [

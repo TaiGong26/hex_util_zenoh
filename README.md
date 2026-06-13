@@ -1,15 +1,15 @@
-<h1 align="center">HEXFELLOW RUNTIME UTILITIES</h1>
+<h1 align="center">HEXFELLOW ZENOH UTILITIES</h1>
 
 <p align="center">
-    <a href="https://github.com/hexfellow/hex_util_runtime/stargazers">
-        <img src="https://img.shields.io/github/stars/hexfellow/hex_util_runtime?style=flat-square&logo=github" />
+    <a href="https://github.com/hexfellow/hex_util_zenoh/stargazers">
+        <img src="https://img.shields.io/github/stars/hexfellow/hex_util_zenoh?style=flat-square&logo=github" />
     </a>
-    <a href="https://github.com/hexfellow/hex_util_runtime/forks">
-        <img src="https://img.shields.io/github/forks/hexfellow/hex_util_runtime?style=flat-square&logo=github" />
+    <a href="https://github.com/hexfellow/hex_util_zenoh/forks">
+        <img src="https://img.shields.io/github/forks/hexfellow/hex_util_zenoh?style=flat-square&logo=github" />
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="https://github.com/hexfellow/hex_util_runtime/issues">
-        <img src="https://img.shields.io/github/issues/hexfellow/hex_util_runtime?style=flat-square&logo=github" />
+    <a href="https://github.com/hexfellow/hex_util_zenoh/issues">
+        <img src="https://img.shields.io/github/issues/hexfellow/hex_util_zenoh?style=flat-square&logo=github" />
     </a>
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <img src="https://img.shields.io/badge/python-≥3.8-blue?style=flat-square&logo=python" />
@@ -21,45 +21,40 @@
 
 # 📖 Overview
 
-## What is `hex_util_runtime`
+## What is `hex_util_zenoh`
 
-`hex_util_runtime` is a lightweight Python utility library providing essential runtime primitives with minimal dependencies. It is part of the HEXFELLOW ecosystem and serves as the foundational layer for time management, inter-process communication, environment configuration, and file system operations.
+`hex_util_zenoh` is a lightweight Python wrapper around [Eclipse Zenoh](https://zenoh.io/), providing a simple pub/sub communication node API. It is part of the HEXFELLOW ecosystem and offers an intuitive interface for Zenoh-based inter-process and inter-machine communication.
 
 | Module | Primary Purpose | Key Components |
 |--------|----------------|----------------|
-| **time_utils** | High-precision time, PTP clock, loop rate control | `ns_now()`, `HexRate`, `HexTimeManager` |
-| **buffer_utils** | Thread-safe variable + lock-free SPSC shared-memory ring buffer | `HexThreadingVar`, `HexShmRingBuffer`, `deque_helper` |
-| **env_util** | Type-safe environment variable readers | `get_env_int()`, `get_env_bool()`, `get_env_ndarray()` |
-| **file_utils** | Safe recursive directory removal | `hex_rmtree()` |
+| **hex_zenoh_node** | Simple pub/sub node wrapping Zenoh sessions | `HexZenohNode` |
 
 ## What problem it solves
 
-- **Unified time interface**: Abstract away the difference between system monotonic clocks and PTP hardware clocks behind a simple `ns_now()` call.
-- **Thread-safe variable exchange**: Wrap any Python value with `HexThreadingVar` to safely read/write across threads using a mutex lock.
-- **High-frequency inter-process streaming**: Provide a lock-free, single-producer-single-consumer shared-memory ring buffer (`HexShmRingBuffer`) optimized for 2–5 kHz+ data rates, avoiding serialization and IPC overhead.
-- **Safe environment configuration**: Read environment variables with proper type conversion and fallback defaults, without repetitive `try/except` boilerplate.
-- **Portable file operations**: Pure-`os` implementation of recursive directory deletion, removing the `shutil` dependency.
+- **Simplified Zenoh API**: Wraps the Eclipse Zenoh Python bindings behind a minimal, ROS-like node interface (`create_pub`, `create_sub`, `pub`).
+- **Easy publisher/subscriber management**: Automatically tracks and reuses publishers per topic. Subscribers automatically unwrap `ZBytes` payloads into plain `bytes` for user callbacks.
+- **Thread-aware**: Designed to be used safely across threads with clear start/close lifecycle.
 
 ## Target users
 
-- Robotics engineers who need low-latency, lock-free shared-memory communication between processes.
-- Developers building real-time control loops with precise timing requirements.
-- Anyone working in the HEXFELLOW ecosystem (`hex_driver_mujoco`, `hex_util_robot`, etc.) who needs runtime primitives.
+- Robotics engineers who need lightweight, decentralised pub/sub communication.
+- Developers using Eclipse Zenoh who want a simpler, more Pythonic API.
+- Anyone building distributed systems in the HEXFELLOW ecosystem.
 
 ## Project structure
 
 ```
-hex_util_runtime/
-├── hex_util_runtime/
-│   ├── __init__.py         # Public exports (__all__)
-│   ├── time_utils.py       # ns_now(), HexRate, HexTimeManager, hex timestamp converters
-│   ├── buffer_utils.py     # HexThreadingVar (thread-safe variable), HexShmRingBuffer (lock-free SPSC SHM ring buffer), deque_helper
-│   ├── env_util.py         # get_env_str/get_env_int/get_env_bool/get_env_float/get_env_ndarray
-│   └── file_utils.py       # hex_rmtree (safe recursive directory removal)
+hex_util_zenoh/
+├── hex_util_zenoh/
+│   ├── __init__.py            # Public exports (HexZenohNode)
+│   └── hex_zenoh_node.py      # HexZenohNode class
+├── examples/
+│   ├── talker.py              # TalkerNode example (ROS 2 talker style)
+│   └── listener.py            # ListenerNode example (ROS 2 listener style)
 ├── docs/
-│   ├── api.md              # Full API reference
-│   └── example.md          # Usage walkthroughs
-└── pyproject.toml          # Project metadata & build configuration
+│   └── api.md                 # API reference
+├── pyproject.toml              # Project metadata & build configuration
+└── venv.sh                     # Virtual environment setup script
 ```
 
 ---
@@ -69,14 +64,14 @@ hex_util_runtime/
 ## Requirements
 
 - **Python** ≥ 3.8
-- **OS**: Linux (POSIX shared memory and PTP clock support are Linux-specific)
+- **OS**: Linux (Zenoh runs on all major platforms; tested on Linux)
 - **Dependencies**:
-  - `numpy ≥ 2.2.6`
+  - `eclipse-zenoh ≥ 1.0.0`
 
 ## Install from PyPI
 
 ```bash
-pip install hex_util_runtime
+pip install hex_util_zenoh
 ```
 
 ## Install from Source
@@ -86,8 +81,8 @@ We use [**uv**](https://github.com/astral-sh/uv) to manage the Python environmen
 1. Clone and install in editable mode:
 
 ```bash
-git clone https://github.com/hexfellow/hex_util_runtime.git
-cd hex_util_runtime
+git clone https://github.com/hexfellow/hex_util_zenoh.git
+cd hex_util_zenoh
 ./venv.sh
 ```
 
@@ -102,29 +97,45 @@ source .venv/bin/activate
 # ⚡ Quick Start
 
 ```python
-from hex_util_runtime import ns_now, HexRate, hex_ts_now
-from hex_util_runtime import get_env_int, hex_rmtree
-from hex_util_runtime import HexThreadingVar, HexShmRingBuffer, deque_helper
+from hex_util_zenoh import HexZenohNode
 
-# Get current time in nanoseconds
-print(ns_now())
+node = HexZenohNode()
+node.start()
 
-# Rate-limited loop (100 Hz)
-rate = HexRate(100)
-for _ in range(10):
-    rate.sleep()
-    print(f"ts: {hex_ts_now()}")
+# Create a publisher and subscriber
+node.create_pub("chatter")
 
-# Read an integer from environment (default 0)
-interval = get_env_int("MY_INTERVAL_MS", default=50)
+def on_message(data: bytes):
+    print(f"Received: {data.decode()}")
+
+node.create_sub("chatter", on_message)
+
+# Publish a message
+node.pub("chatter", b"Hello, Zenoh!")
+
+# Clean up
+node.close()
+```
+
+### Running the examples
+
+Open two terminals. In the first:
+
+```bash
+python examples/talker.py
+```
+
+In the second:
+
+```bash
+python examples/listener.py
 ```
 
 ---
 
 # 📑 Documentation
 
-- [**API Reference**](docs/api.md) — Detailed documentation of all classes and functions.
-- [**Examples**](docs/example.md) — Usage walkthroughs for each module.
+- [**API Reference**](docs/api.md) — Detailed documentation of the `HexZenohNode` class.
 
 ---
 
@@ -146,12 +157,12 @@ Apache License 2.0. See [LICENSE](LICENSE).
 
 # 🌟 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=hexfellow/hex_util_runtime&type=Date)](https://star-history.com/#hexfellow/hex_util_runtime&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=hexfellow/hex_util_zenoh&type=Date)](https://star-history.com/#hexfellow/hex_util_zenoh&Date)
 
 ---
 
 # 👥 Contributors
 
-<a href="https://github.com/hexfellow/hex_util_runtime/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=hexfellow/hex_util_runtime" />
+<a href="https://github.com/hexfellow/hex_util_zenoh/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=hexfellow/hex_util_zenoh" />
 </a>

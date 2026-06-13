@@ -7,6 +7,7 @@
 ################################################################
 
 import time
+from collections import deque
 from hex_util_zenoh import HexZenohNode
 
 
@@ -14,27 +15,34 @@ class ListenerNode(HexZenohNode):
 
     def __init__(self):
         super().__init__()
+        self.__message_queue = deque()
 
     def on_message(self, data: bytes) -> None:
-        print(f"ListenerNode: Received: '{data.decode('utf-8')}'")
+        self.__message_queue.append(data)
 
-    def run(self) -> None:
-        self.start()
+    def get_message(self, latest: bool = False) -> bytes:
+        return self.deque_helper(self.__message_queue, latest)
+
+    def start(self) -> None:
+        super().start()
         self.create_sub("chatter", self.on_message)
-        print("ListenerNode: Listening on 'chatter'...")
-        try:
-            while self.is_working:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            pass
-        finally:
-            self.close()
-            print("ListenerNode: Stopped.")
 
 
 def main():
     node = ListenerNode()
-    node.run()
+    node.start()
+    print("ListenerNode: Listening on 'chatter'...")
+    try:
+        while node.is_working:
+            message = node.get_message(latest=True)
+            if message is not None:
+                print(f"ListenerNode: Received: '{message.decode()}'")
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        node.close()
+        print("ListenerNode: Stopped.")
 
 
 if __name__ == "__main__":

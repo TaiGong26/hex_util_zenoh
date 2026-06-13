@@ -7,7 +7,8 @@
 ################################################################
 
 import zenoh
-from typing import Callable, Dict, Optional
+from collections import deque
+from typing import Callable, Dict, Optional, Any
 
 
 class HexZenohNode:
@@ -27,6 +28,19 @@ class HexZenohNode:
     def is_working(self) -> bool:
         return self._is_working
 
+    @staticmethod
+    def deque_helper(dq: deque, latest: bool = False) -> Optional[Any]:
+        if not latest:
+            if dq:
+                return dq.popleft()
+            else:
+                return None
+        else:
+            ret = None
+            while dq:
+                ret = dq.popleft()
+            return ret
+
     def start(self) -> None:
         if self._session is not None:
             return
@@ -45,17 +59,19 @@ class HexZenohNode:
         self._session.close()
         self._session = None
 
-    def create_pub(self, topic_name: str) -> zenoh.Publisher:
+    def create_pub(self, topic_name: str):
         if self._session is None:
             raise RuntimeError("Session not opened. Call open() first.")
         if topic_name in self._publishers:
             return self._publishers[topic_name]
         publisher = self._session.declare_publisher(topic_name)
         self._publishers[topic_name] = publisher
-        return publisher
 
-    def create_sub(self, topic_name: str,
-                   callback: Callable[[bytes], None]) -> zenoh.Subscriber:
+    def create_sub(
+        self,
+        topic_name: str,
+        callback: Callable[[bytes], None],
+    ):
         if self._session is None:
             raise RuntimeError("Session not opened. Call open() first.")
 
@@ -66,9 +82,8 @@ class HexZenohNode:
         subscriber = self._session.declare_subscriber(topic_name,
                                                       _zenoh_callback)
         self._subscribers[topic_name] = subscriber
-        return subscriber
 
-    def pub(self, topic_name: str, data: bytes) -> None:
+    def pub(self, topic_name: str, data: bytes):
         if self._session is None:
             raise RuntimeError("Session not opened. Call open() first.")
         publisher = self._publishers.get(topic_name)
