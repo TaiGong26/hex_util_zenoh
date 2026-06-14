@@ -19,8 +19,8 @@ class TalkerNode(HexZenohNode):
         super().start()
         self.create_pub("chatter")
 
-    def pub_chatter(self, message: bytes) -> None:
-        self.pub("chatter", message)
+    def pub_chatter(self, message: str) -> None:
+        self.pub("chatter", message.encode("utf-8"))
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     try:
         while node.is_working:
             message = f"Hello World: {count}"
-            node.pub_chatter(message.encode("utf-8"))
+            node.pub_chatter(message)
             print(f"TalkerNode: Published: '{message}'")
             count += 1
             time.sleep(1)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hex_util_zenoh"
-version = "0.0.1-alpha.1"
+version = "0.0.1-alpha.2"
 description = "HEXFELLOW Zenoh Communication Utilities"
 readme = "README.md"
 license = "Apache-2.0"
@@ -22,6 +22,8 @@ classifiers = [
   "Intended Audience :: Science/Research",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",

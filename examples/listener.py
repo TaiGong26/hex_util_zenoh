@@ -15,12 +15,15 @@ class ListenerNode(HexZenohNode):
 
     def __init__(self):
         super().__init__()
-        self.__message_queue = deque()
+        self.__message_queue = deque(maxlen=100)
 
     def on_message(self, data: bytes) -> None:
-        self.__message_queue.append(data)
+        try:
+            self.__message_queue.append(data.decode("utf-8"))
+        except UnicodeDecodeError:
+            print("ListenerNode: Received invalid data format.")
 
-    def get_message(self, latest: bool = False) -> bytes:
+    def get_message(self, latest: bool = False) -> str:
         return self.deque_helper(self.__message_queue, latest)
 
     def start(self) -> None:
@@ -36,7 +39,7 @@ def main():
         while node.is_working:
             message = node.get_message(latest=True)
             if message is not None:
-                print(f"ListenerNode: Received: '{message.decode()}'")
+                print(f"ListenerNode: Received: '{message}'")
             time.sleep(0.1)
     except KeyboardInterrupt:
         pass
