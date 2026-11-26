@@ -109,12 +109,15 @@ class DualArmActionManipFrame(TypedDict):
 
     Attributes:
         header (HeaderStamp): Reference time of the chunk.
-        chunk_step_interval_ms (int): Duration of one step.
-        action_mode (str): Mode of the steps, carried as the sender wrote
-            it; the action layer decides what it means.
-        arm_ctrl_mode (str): One of ``ARM_CTRL_MODES``.
+        chunk_step_interval_ms (int): Duration of one step, in milliseconds.
+        action_mode (str): How the steps are read, one of ``abs``, ``delta``
+            or ``diff``.
+        arm_ctrl_mode (str): What the steps address, either ``pos`` or
+            ``ee``; ``mit`` is not accepted here.
         arm (dict): Arm steps keyed by the model field name, each of shape
-            ``(steps, dof)``.
+            ``(steps, dof)``; the pairs ``(pos, abs)``, ``(pos, delta)``,
+            ``(pos, diff)``, ``(ee, abs)`` and ``(ee, delta)`` are the ones
+            the action layer restores.
         grip (dict): Gripper steps keyed by the model field name, each of shape
             ``(steps, dof)``.
     """
